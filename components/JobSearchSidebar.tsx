@@ -48,9 +48,9 @@ export default function JobSearchSidebar({
         <h2 className="text-xs font-semibold text-gray-900 dark:text-white uppercase tracking-wider">
           ค้นหาด่วน (Search Filter)
         </h2>
-        <span className="text-[9px] px-1.5 py-0.5 bg-[var(--color-primary)]/10 text-[var(--color-primary)] font-semibold rounded uppercase">
+        {/* <span className="text-[9px] px-1.5 py-0.5 bg-[var(--color-primary)]/10 text-[var(--color-primary)] font-semibold rounded uppercase">
           JobThai Style
-        </span>
+        </span> */}
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-4">
