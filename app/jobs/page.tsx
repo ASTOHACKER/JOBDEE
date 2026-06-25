@@ -12,29 +12,31 @@ export default async function JobsPage() {
   return (
     <>
       <Navbar />
-      <main className="container mx-auto px-6 py-12">
-        <h1 className="text-3xl font-bold mb-8">หางาน</h1>
+      <main className="container mx-auto px-6 py-12 max-w-5xl">
+        <h1 className="text-2xl font-medium tracking-tight mb-8">หางานทั้งหมด</h1>
 
         {jobs && jobs.length > 0 ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
             {jobs.map((job) => (
-              <div key={job.id} className="glass-panel p-6 rounded-2xl hover:border-[#6366f1] border border-gray-800 transition-colors">
-                <h3 className="text-lg font-medium mb-2">{job.title}</h3>
-                <p className="text-sm text-gray-400 mb-1">{job.location || "ไม่ระบุสถานที่"}</p>
-                <p className="text-sm text-[#10b981] font-medium mb-4">
-                  {job.salary ? `${Number(job.salary).toLocaleString()} บาท/เดือน` : "ตามตกลง"}
-                </p>
-                <p className="text-sm text-gray-400 line-clamp-2 mb-4">{job.description || ""}</p>
-                <Link href={`/jobs/${job.id}`} className="block text-center py-2 border border-[#6366f1] rounded-lg text-[#6366f1] text-sm hover:bg-[#6366f1] hover:text-white transition-colors">
-                  ดูรายละเอียด
+              <div key={job.id} className="glass-panel p-6 rounded-xl hover:border-gray-700 transition-all duration-300 flex flex-col justify-between">
+                <div>
+                  <h3 className="text-base font-medium text-white mb-1">{job.title}</h3>
+                  <p className="text-xs text-gray-500 mb-3">{job.location || "ไม่ระบุสถานที่"}</p>
+                  <p className="text-xs text-[var(--color-accent)] font-medium mb-4">
+                    {job.salary ? `${Number(job.salary).toLocaleString()} บาท/เดือน` : "ตามตกลง"}
+                  </p>
+                  <p className="text-xs text-gray-400 line-clamp-2 leading-relaxed mb-6">{job.description || "ไม่มีรายละเอียดเพิ่มเติม"}</p>
+                </div>
+                <Link href={`/jobs/${job.id}`} className="block text-center py-2.5 bg-white/5 border border-white/10 rounded-lg text-xs font-medium text-white hover:bg-white/10 transition-all duration-200">
+                  ดูรายละเอียดงาน
                 </Link>
               </div>
             ))}
           </div>
         ) : (
-          <div className="text-center py-20 text-gray-400">
-            <p className="text-lg">ยังไม่มีประกาศงานในระบบ</p>
-            <p className="text-sm mt-2">บริษัทสามารถลงประกาศได้ที่หน้า สำหรับบริษัท</p>
+          <div className="text-center py-20 glass-panel rounded-xl">
+            <p className="text-sm text-gray-400">ยังไม่มีตำแหน่งงานที่ประกาศในขณะนี้</p>
+            <p className="text-xs text-gray-600 mt-2">บริษัทสามารถลงประกาศตำแหน่งงานได้จากแดชบอร์ด</p>
           </div>
         )}
       </main>

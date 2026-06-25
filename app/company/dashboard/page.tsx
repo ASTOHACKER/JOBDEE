@@ -17,53 +17,61 @@ export default async function CompanyDashboard() {
   return (
     <>
       <Navbar />
-      <main className="container mx-auto px-6 py-10">
-        <h1 className="text-2xl font-semibold mb-8">สำหรับบริษัท</h1>
+      <main className="container mx-auto px-6 py-12 max-w-5xl">
+        <div className="flex justify-between items-center mb-8">
+          <h1 className="text-2xl font-medium tracking-tight">แดชบอร์ดบริษัท</h1>
+          <span className="text-xs text-gray-500">จัดการและลงประกาศงานของคุณ</span>
+        </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
           {/* ฟอร์มลงประกาศ */}
-          <div className="glass-panel p-5 rounded-xl">
-            <h2 className="text-sm font-medium text-gray-400 uppercase tracking-wide mb-4">ลงประกาศงานใหม่</h2>
-            <form action={createJob} className="space-y-3">
+          <div className="lg:col-span-2 glass-panel p-6 rounded-xl h-fit">
+            <h2 className="text-xs font-medium text-gray-500 uppercase tracking-wider mb-5">ลงประกาศงานใหม่</h2>
+            <form action={createJob} className="space-y-4">
               <div>
-                <label className="text-xs text-gray-500 mb-1 block">ตำแหน่งงาน *</label>
-                <input name="title" required className="input-field" />
+                <label className="text-[10px] text-gray-500 uppercase mb-1.5 block">ตำแหน่งงาน *</label>
+                <input name="title" required className="input-field" placeholder="เช่น Software Engineer" />
               </div>
               <div>
-                <label className="text-xs text-gray-500 mb-1 block">รายละเอียดงาน</label>
-                <textarea name="description" rows={4} className="input-field" />
+                <label className="text-[10px] text-gray-500 uppercase mb-1.5 block">รายละเอียดงาน</label>
+                <textarea name="description" rows={4} className="input-field" placeholder="รายละเอียดหน้าที่ความรับผิดชอบ..." />
               </div>
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="text-xs text-gray-500 mb-1 block">เงินเดือน (บาท)</label>
-                  <input name="salary" type="number" className="input-field" />
+                  <label className="text-[10px] text-gray-500 uppercase mb-1.5 block">เงินเดือน (บาท)</label>
+                  <input name="salary" type="number" className="input-field" placeholder="ตามตกลง" />
                 </div>
                 <div>
-                  <label className="text-xs text-gray-500 mb-1 block">สถานที่ทำงาน</label>
-                  <input name="location" className="input-field" />
+                  <label className="text-[10px] text-gray-500 uppercase mb-1.5 block">สถานที่ทำงาน</label>
+                  <input name="location" className="input-field" placeholder="เช่น กรุงเทพฯ / Remote" />
                 </div>
               </div>
-              <button type="submit" className="w-full p-3 bg-[var(--color-primary)] text-white rounded-lg text-sm font-medium hover:bg-[var(--color-primary-hover)] transition-colors">
-                ลงประกาศ
+              <button type="submit" className="no-print w-full p-3 bg-[var(--color-primary)] text-white rounded-lg text-xs font-medium hover:bg-[var(--color-primary-hover)] transition-colors cursor-pointer">
+                ลงประกาศตำแหน่งนี้
               </button>
             </form>
           </div>
 
           {/* รายการงาน */}
-          <div>
-            <h2 className="text-sm font-medium text-gray-400 uppercase tracking-wide mb-4">งานที่ลงประกาศแล้ว ({jobs?.length || 0})</h2>
+          <div className="lg:col-span-3 space-y-4">
+            <h2 className="text-xs font-medium text-gray-500 uppercase tracking-wider">ตำแหน่งงานที่เปิดรับ ({jobs?.length || 0})</h2>
             <div className="space-y-3">
               {jobs && jobs.length > 0 ? (
                 jobs.map((job) => (
-                  <div key={job.id} className="glass-panel p-4 rounded-xl">
-                    <h3 className="text-sm font-medium">{job.title}</h3>
-                    <p className="text-xs text-gray-500 mt-1">
-                      {job.location || "ไม่ระบุสถานที่"} • {job.salary ? `${Number(job.salary).toLocaleString()} บาท` : "ตามตกลง"}
-                    </p>
+                  <div key={job.id} className="glass-panel p-5 rounded-xl flex justify-between items-start">
+                    <div>
+                      <h3 className="text-sm font-medium text-white">{job.title}</h3>
+                      <p className="text-xs text-gray-500 mt-1">
+                        {job.location || "ไม่ระบุสถานที่"} • {job.salary ? `${Number(job.salary).toLocaleString()} บาท/เดือน` : "ตามตกลง"}
+                      </p>
+                    </div>
+                    <span className="px-2 py-1 bg-green-950/30 border border-green-900/40 rounded text-[9px] text-green-400 font-medium">เปิดรับสมัคร</span>
                   </div>
                 ))
               ) : (
-                <p className="text-sm text-gray-600">ยังไม่มีประกาศงาน</p>
+                <div className="glass-panel p-8 rounded-xl text-center">
+                  <p className="text-xs text-gray-500">คุณยังไม่ได้ลงประกาศตำแหน่งงานใดๆ</p>
+                </div>
               )}
             </div>
           </div>

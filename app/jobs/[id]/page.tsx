@@ -17,9 +17,7 @@ export default async function JobDetailPage({ params }: PageProps) {
     .eq("id", id)
     .single();
 
-  if (!job) {
-    notFound();
-  }
+  if (!job) notFound();
 
   const { data: company } = await supabase
     .from("profiles")
@@ -31,37 +29,37 @@ export default async function JobDetailPage({ params }: PageProps) {
     <>
       <Navbar />
       <main className="container mx-auto px-6 py-12 max-w-2xl">
-        <Link href="/jobs" className="text-sm text-gray-500 hover:text-white mb-6 inline-block transition-colors">
-          ← กลับไปหน้าหางาน
+        <Link href="/jobs" className="no-print text-xs text-gray-500 hover:text-gray-300 mb-6 inline-block transition-colors">
+          ← ย้อนกลับไปหน้ารายการงาน
         </Link>
 
-        <div className="glass-panel p-6 rounded-2xl space-y-6">
+        <div className="glass-panel p-8 rounded-xl space-y-6">
           <div>
-            <h1 className="text-2xl font-semibold mb-2">{job.title}</h1>
-            <p className="text-sm text-gray-400">
+            <h1 className="text-xl font-medium tracking-tight mb-2 text-white">{job.title}</h1>
+            <p className="text-xs text-gray-500">
               {company?.full_name || "ไม่ระบุชื่อบริษัท"} • {job.location || "ไม่ระบุสถานที่"}
             </p>
           </div>
 
-          <div className="border-t border-gray-800/50 pt-4">
-            <span className="text-xs text-gray-500 block">เงินเดือน</span>
-            <span className="text-lg font-medium text-[var(--color-accent)]">
+          <div className="border-t border-gray-800/40 pt-5">
+            <span className="text-[10px] text-gray-500 uppercase tracking-wider block mb-1">ผลตอบแทน</span>
+            <span className="text-base font-medium text-[var(--color-accent)]">
               {job.salary ? `${Number(job.salary).toLocaleString()} บาท/เดือน` : "ตามตกลง"}
             </span>
           </div>
 
           {job.description && (
-            <div className="border-t border-gray-800/50 pt-4">
-              <span className="text-xs text-gray-500 block mb-2">รายละเอียดงาน</span>
-              <p className="text-sm text-gray-300 leading-relaxed whitespace-pre-wrap">
+            <div className="border-t border-gray-800/40 pt-5">
+              <span className="text-[10px] text-gray-500 uppercase tracking-wider block mb-2">รายละเอียดงาน</span>
+              <p className="text-xs text-gray-300 leading-relaxed whitespace-pre-wrap">
                 {job.description}
               </p>
             </div>
           )}
 
-          <div className="border-t border-gray-800/50 pt-6">
-            <button className="w-full py-3 bg-[var(--color-primary)] text-white rounded-xl text-sm font-medium hover:bg-[var(--color-primary-hover)] transition-colors">
-              สมัครงานนี้
+          <div className="no-print border-t border-gray-800/40 pt-6">
+            <button className="w-full py-3 bg-[var(--color-primary)] text-white rounded-lg text-xs font-medium hover:bg-[var(--color-primary-hover)] transition-all cursor-pointer">
+              ส่งใบสมัครงาน
             </button>
           </div>
         </div>

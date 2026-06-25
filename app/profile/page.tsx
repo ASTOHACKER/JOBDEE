@@ -29,24 +29,24 @@ export default async function ProfilePage() {
   ];
 
   return (
-    <div>
-      <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-semibold">โปรไฟล์</h1>
-        <Link href="/profile/edit" className="px-4 py-2 bg-[var(--color-primary)] rounded-lg text-white text-sm font-medium hover:bg-[var(--color-primary-hover)] transition-colors">
+    <div className="space-y-6">
+      <div className="flex justify-between items-center">
+        <h1 className="text-xl font-medium tracking-tight">โปรไฟล์</h1>
+        <Link href="/profile/edit" className="no-print px-4 py-2 bg-white/5 border border-white/10 rounded-lg text-xs font-medium hover:bg-white/10 transition-all">
           แก้ไขข้อมูล
         </Link>
       </div>
 
-      <div className="glass-panel p-5 rounded-xl mb-5">
-        <h2 className="text-lg font-medium">{profile?.full_name || "ยังไม่ได้ระบุชื่อ"}</h2>
+      <div className="glass-panel p-6 rounded-xl">
+        <h2 className="text-base font-medium text-white">{profile?.full_name || "ยังไม่ได้ระบุชื่อ"}</h2>
         <p className="text-xs text-gray-500 mt-1">{profile?.role === "company" ? "บริษัท" : "ผู้สมัครงาน"}</p>
       </div>
 
-      <div className="glass-panel p-5 rounded-xl">
-        {fields.map((f, i) => (
-          <div key={f.label} className={`flex justify-between py-3 ${i < fields.length - 1 ? "border-b border-gray-800/50" : ""}`}>
-            <span className="text-sm text-gray-500">{f.label}</span>
-            <span className="text-sm font-medium">{f.value || <span className="text-gray-600">ไม่ได้ระบุ</span>}</span>
+      <div className="glass-panel p-6 rounded-xl divide-y divide-gray-800/40">
+        {fields.map((f) => (
+          <div key={f.label} className="flex justify-between py-3.5 first:pt-0 last:pb-0">
+            <span className="text-xs text-gray-500">{f.label}</span>
+            <span className="text-xs font-normal text-gray-300">{f.value || <span className="text-gray-700">ไม่ได้ระบุ</span>}</span>
           </div>
         ))}
       </div>
