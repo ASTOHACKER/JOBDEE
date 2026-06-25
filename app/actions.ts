@@ -117,7 +117,7 @@ export async function updatePassword(_prevState: unknown, formData: FormData) {
   return { success: "เปลี่ยนรหัสผ่านของคุณเรียบร้อยแล้ว" };
 }
 
-// ---- Jobs (Company) ----
+// ---- Jobs (Company CRUD) ----
 
 export async function createJob(formData: FormData) {
   const supabase = await createClient();
@@ -136,4 +136,101 @@ export async function createJob(formData: FormData) {
   revalidatePath("/company/dashboard");
   revalidatePath("/jobs");
   revalidatePath("/");
+}
+
+export async function updateJob(formData: FormData) {
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) throw new Error("Unauthorized");
+
+  const id = formData.get("id") as string;
+
+  const { error } = await supabase
+    .from("jobs")
+    .update({
+      title: formData.get("title") as string,
+      description: formData.get("description") as string,
+      salary: Number(formData.get("salary")) || null,
+      location: formData.get("location") as string,
+    })
+    .eq("id", id)
+    .eq("company_id", user.id);
+
+  if (error) throw new Error(error.message);
+  revalidatePath("/company/dashboard");
+  revalidatePath("/jobs");
+  revalidatePath(`/jobs/${id}`);
+}
+
+export async function deleteJob(formData: FormData) {
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) throw new Error("Unauthorized");
+
+  const id = formData.get("id") as string;
+
+  const { error } = await supabase
+    .from("jobs")
+    .delete()
+    .eq("id", id)
+    .eq("company_id", user.id);
+
+  if (error) throw new Error(error.message);
+  revalidatePath("/company/dashboard");
+  revalidatePath("/jobs");
+}
+
+// ---- Applications (Candidate & Company CRUD) ----
+
+export async function applyJob(formData: FormData) {
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) redirect("/login");
+
+  const jobId = formData.get("job_id") as string;
+
+  const { error } = await supabase.from("applications").insert({
+    job_id: jobId,
+    candidate_id: user.id,
+  });
+
+  if (error) throw new Error(error.message);
+  revalidatePath(`/jobs/${jobId}`);
+  revalidatePath("/dashboard");
+}
+
+export async function cancelApplication(formData: FormData) {
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) throw new Error("Unauthorized");
+
+  const applicationId = formData.get("application_id") as string;
+  const jobId = formData.get("job_id") as string;
+
+  const { error } = await supabase
+    .from("applications")
+    .delete()
+    .eq("id", applicationId)
+    .eq("candidate_id", user.id);
+
+  if (error) throw new Error(error.message);
+  revalidatePath(`/jobs/${jobId}`);
+  revalidatePath("/dashboard");
+}
+
+export async function updateApplicationStatus(formData: FormData) {
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) throw new Error("Unauthorized");
+
+  const applicationId = formData.get("application_id") as string;
+  const status = formData.get("status") as string;
+
+  const { error } = await supabase
+    .from("applications")
+    .update({ status })
+    .eq("id", applicationId);
+
+  if (error) throw new Error(error.message);
+  revalidatePath("/company/dashboard");
 }
