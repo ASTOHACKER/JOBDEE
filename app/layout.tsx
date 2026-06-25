@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Prompt, Outfit } from "next/font/google";
+import { ThemeProvider } from "@/components/ThemeProvider";
 import "./globals.css";
 
 const prompt = Prompt({
@@ -28,8 +29,13 @@ export default function RootLayout({
     <html
       lang="th"
       className={`${prompt.variable} ${outfit.variable} h-full antialiased`}
+      suppressHydrationWarning
     >
-      <body className="min-h-full flex flex-col font-sans">{children}</body>
+      <body className="min-h-full flex flex-col font-sans">
+        <ThemeProvider>
+          {children}
+        </ThemeProvider>
+      </body>
     </html>
   );
 }
