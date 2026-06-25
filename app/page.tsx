@@ -29,16 +29,17 @@ export default async function Home() {
             ค้นหาตำแหน่งงานจากบริษัทชั้นนำ ฝากประวัติ และสมัครงานได้ทันที
           </p>
 
-          <div className="max-w-lg mx-auto flex gap-2">
+          <form action="/jobs" method="GET" className="max-w-lg mx-auto flex gap-2">
             <input
+              name="q"
               type="text"
               placeholder="ตำแหน่งงาน, บริษัท, หรือสถานที่..."
               className="input-field flex-1"
             />
-            <button className="px-6 py-3 bg-[var(--color-primary)] text-white rounded-lg text-xs font-medium hover:bg-[var(--color-primary-hover)] transition-colors cursor-pointer">
+            <button type="submit" className="px-6 py-3 bg-[var(--color-primary)] text-white rounded-lg text-xs font-medium hover:bg-[var(--color-primary-hover)] transition-colors cursor-pointer">
               ค้นหา
             </button>
-          </div>
+          </form>
         </section>
 
         {/* Stats (ข้อมูลจริงจาก Database) */}

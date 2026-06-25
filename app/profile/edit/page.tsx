@@ -9,176 +9,220 @@ export default async function ProfileEditPage() {
 
   const { data: profile } = await supabase
     .from("profiles")
-    .select("full_name, full_data")
+    .select("*")
     .eq("id", user.id)
     .single();
 
-  const d = (profile?.full_data as Record<string, string>) || {};
+  const fullData = profile?.full_data || {};
+
+  const sectionTitle = "text-xs font-medium text-gray-500 uppercase tracking-wider mb-4 border-b border-gray-200/20 dark:border-gray-800/40 pb-2";
+  const labelClass = "text-[10px] text-gray-500 uppercase mb-1.5 block";
+  const inputClass = "w-full p-3 bg-gray-200/40 dark:bg-white/5 border border-gray-300/30 dark:border-white/5 rounded-lg focus:ring-2 focus:ring-[#6366f1] outline-none text-sm text-gray-900 dark:text-white";
 
   return (
-    <div className="space-y-6">
-      <h1 className="text-xl font-medium tracking-tight">แก้ไขประวัติ</h1>
-      
-      <form action={updateProfile} className="space-y-6">
+    <div className="space-y-6 max-w-2xl">
+      <div className="flex justify-between items-center">
+        <h1 className="text-xl font-medium tracking-tight">แก้ไขข้อมูลประวัติส่วนตัว</h1>
+        <span className="text-xs text-gray-500">ข้อมูลทั้งหมดจะแสดงในเรซูเมของคุณ</span>
+      </div>
 
-        {/* ข้อมูลส่วนตัว */}
-        <section className="glass-panel p-6 rounded-xl space-y-4">
-          <h2 className="text-xs font-medium text-gray-500 uppercase tracking-wider">ข้อมูลส่วนตัว</h2>
-          
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <form action={updateProfile} className="space-y-8" encType="multipart/form-data">
+        {/* ซ่อน URL ของเรซูเมเดิมไว้เพื่อไม่ให้หายไปถ้าผู้ใช้ไม่ได้อัปโหลดใหม่ */}
+        <input type="hidden" name="existing_resume_url" value={fullData.resume_url || ""} />
+
+        {/* 0. อัปโหลดไฟล์ PDF */}
+        <div className="glass-panel p-6 rounded-xl space-y-4">
+          <h2 className={sectionTitle}>เอกสารเรซูเม (PDF)</h2>
+          <div>
+            <label className={labelClass}>แนบไฟล์เรซูเม (จำกัดเฉพาะ .pdf เท่านั้น)</label>
+            <input 
+              name="resume" 
+              type="file" 
+              accept=".pdf" 
+              className="w-full text-xs text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-xs file:font-medium file:bg-[var(--color-primary)] file:text-white hover:file:bg-[var(--color-primary-hover)] file:cursor-pointer" 
+            />
+            {fullData.resume_url && (
+              <p className="text-xs text-gray-400 mt-3">
+                ไฟล์ปัจจุบัน: <a href={fullData.resume_url} target="_blank" rel="noreferrer" className="text-[var(--color-primary)] hover:underline">คลิกเพื่อเปิดดูไฟล์เรซูเม</a>
+              </p>
+            )}
+          </div>
+        </div>
+
+        {/* 1. ข้อมูลส่วนตัว */}
+        <div className="glass-panel p-6 rounded-xl space-y-4">
+          <h2 className={sectionTitle}>ข้อมูลส่วนตัวทั่วไป</h2>
+          <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="text-[10px] text-gray-500 uppercase mb-1.5 block">ชื่อ-นามสกุล *</label>
-              <input name="full_name" defaultValue={profile?.full_name || ""} required className="input-field" />
+              <label className={labelClass}>ชื่อ-นามสกุล *</label>
+              <input name="full_name" required defaultValue={profile?.full_name || ""} className={inputClass} placeholder="เช่น สมชาย ใจดี" />
             </div>
             <div>
-              <label className="text-[10px] text-gray-500 uppercase mb-1.5 block">เบอร์โทรศัพท์ *</label>
-              <input name="phone" defaultValue={d.phone || ""} required className="input-field" />
+              <label className={labelClass}>เบอร์โทรศัพท์</label>
+              <input name="phone" defaultValue={fullData.phone || ""} className={inputClass} placeholder="เช่น 0891234567" />
             </div>
           </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="grid grid-cols-3 gap-4">
             <div>
-              <label className="text-[10px] text-gray-500 uppercase mb-1.5 block">เพศ</label>
-              <select name="gender" defaultValue={d.gender || ""} className="input-field">
-                <option value="">เลือก</option>
-                <option value="male">ชาย</option>
-                <option value="female">หญิง</option>
+              <label className={labelClass}>เพศ</label>
+              <select name="gender" defaultValue={fullData.gender || ""} className={inputClass}>
+                <option value="">เลือกเพศ</option>
+                <option value="ชาย">ชาย</option>
+                <option value="หญิง">หญิง</option>
+                <option value="อื่นๆ">อื่นๆ</option>
               </select>
             </div>
             <div>
-              <label className="text-[10px] text-gray-500 uppercase mb-1.5 block">วันเกิด</label>
-              <input name="birthdate" type="date" defaultValue={d.birthdate || ""} className="input-field" />
+              <label className={labelClass}>วันเกิด</label>
+              <input name="birthdate" type="date" defaultValue={fullData.birthdate || ""} className={inputClass} />
             </div>
             <div>
-              <label className="text-[10px] text-gray-500 uppercase mb-1.5 block">สัญชาติ</label>
-              <input name="nationality" defaultValue={d.nationality || "ไทย"} className="input-field" />
+              <label className={labelClass}>สัญชาติ</label>
+              <input name="nationality" defaultValue={fullData.nationality || ""} className={inputClass} placeholder="เช่น ไทย" />
             </div>
           </div>
+        </div>
 
+        {/* 2. ข้อมูลติดต่อและที่อยู่ */}
+        <div className="glass-panel p-6 rounded-xl space-y-4">
+          <h2 className={sectionTitle}>ที่อยู่ติดต่อ</h2>
           <div>
-            <label className="text-[10px] text-gray-500 uppercase mb-1.5 block">ที่อยู่ปัจจุบัน</label>
-            <textarea name="address" defaultValue={d.address || ""} rows={2} className="input-field" />
+            <label className={labelClass}>ที่อยู่ปัจจุบัน</label>
+            <textarea name="address" defaultValue={fullData.address || ""} rows={2} className={inputClass} placeholder="เลขที่บ้าน ถนน ซอย..." />
           </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="grid grid-cols-3 gap-4">
             <div>
-              <label className="text-[10px] text-gray-500 uppercase mb-1.5 block">จังหวัด *</label>
-              <input name="province" defaultValue={d.province || ""} className="input-field" />
+              <label className={labelClass}>จังหวัด</label>
+              <input name="province" defaultValue={fullData.province || ""} className={inputClass} placeholder="เช่น สงขลา" />
             </div>
             <div>
-              <label className="text-[10px] text-gray-500 uppercase mb-1.5 block">อำเภอ *</label>
-              <input name="district" defaultValue={d.district || ""} className="input-field" />
+              <label className={labelClass}>อำเภอ / เขต</label>
+              <input name="district" defaultValue={fullData.district || ""} className={inputClass} placeholder="เช่น หาดใหญ่" />
             </div>
             <div>
-              <label className="text-[10px] text-gray-500 uppercase mb-1.5 block">รหัสไปรษณีย์</label>
-              <input name="zipcode" defaultValue={d.zipcode || ""} className="input-field" />
-            </div>
-          </div>
-        </section>
-
-        {/* ตำแหน่งที่ต้องการ */}
-        <section className="glass-panel p-6 rounded-xl space-y-4">
-          <h2 className="text-xs font-medium text-gray-500 uppercase tracking-wider">ตำแหน่งงานที่ต้องการ</h2>
-          
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <label className="text-[10px] text-gray-500 uppercase mb-1.5 block">ตำแหน่ง *</label>
-              <input name="desired_position" defaultValue={d.desired_position || ""} className="input-field" />
-            </div>
-            <div>
-              <label className="text-[10px] text-gray-500 uppercase mb-1.5 block">เงินเดือนที่ต้องการ (บาท)</label>
-              <input name="desired_salary" type="number" defaultValue={d.desired_salary || ""} className="input-field" />
+              <label className={labelClass}>รหัสไปรษณีย์</label>
+              <input name="zipcode" defaultValue={fullData.zipcode || ""} className={inputClass} placeholder="เช่น 90110" />
             </div>
           </div>
+        </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        {/* 3. งานที่ต้องการ */}
+        <div className="glass-panel p-6 rounded-xl space-y-4">
+          <h2 className={sectionTitle}>ความต้องการในการทำงาน</h2>
+          <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="text-[10px] text-gray-500 uppercase mb-1.5 block">ประเภทการจ้างงาน</label>
-              <select name="employment_type" defaultValue={d.employment_type || ""} className="input-field">
-                <option value="">เลือก</option>
-                <option value="fulltime">ประจำ</option>
-                <option value="freelance">ฟรีแลนซ์</option>
-                <option value="parttime">พาร์ทไทม์</option>
-                <option value="intern">ฝึกงาน</option>
+              <label className={labelClass}>ตำแหน่งงานที่คาดหวัง</label>
+              <input name="desired_position" defaultValue={fullData.desired_position || ""} className={inputClass} placeholder="เช่น Full Stack Developer" />
+            </div>
+            <div>
+              <label className={labelClass}>เงินเดือนที่ต้องการ (บาท)</label>
+              <input name="desired_salary" type="number" defaultValue={fullData.desired_salary || ""} className={inputClass} placeholder="เช่น 35000" />
+            </div>
+          </div>
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <label className={labelClass}>รูปแบบการทำงาน</label>
+              <select name="employment_type" defaultValue={fullData.employment_type || ""} className={inputClass}>
+                <option value="">เลือกรูปแบบ</option>
+                <option value="งานประจำ">งานประจำ</option>
+                <option value="งานพาร์ทไทม์">งานพาร์ทไทม์</option>
+                <option value="ฟรีแลนซ์">ฟรีแลนซ์</option>
+                <option value="ฝึกงาน">ฝึกงาน</option>
               </select>
             </div>
             <div>
-              <label className="text-[10px] text-gray-500 uppercase mb-1.5 block">วันที่สามารถเริ่มงานได้</label>
-              <input name="available_date" type="date" defaultValue={d.available_date || ""} className="input-field" />
+              <label className={labelClass}>วันที่พร้อมเริ่มงาน</label>
+              <input name="available_date" type="date" defaultValue={fullData.available_date || ""} className={inputClass} />
             </div>
           </div>
-        </section>
+        </div>
 
-        {/* การศึกษา */}
-        <section className="glass-panel p-6 rounded-xl space-y-4">
-          <h2 className="text-xs font-medium text-gray-500 uppercase tracking-wider">การศึกษา</h2>
-          
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        {/* 4. ประวัติการศึกษา */}
+        <div className="glass-panel p-6 rounded-xl space-y-4">
+          <h2 className={sectionTitle}>ประวัติการศึกษา</h2>
+          <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="text-[10px] text-gray-500 uppercase mb-1.5 block">สถานภาพ</label>
-              <select name="education_status" defaultValue={d.education_status || ""} className="input-field">
-                <option value="">เลือก</option>
-                <option value="graduated">จบการศึกษา</option>
-                <option value="studying">กำลังศึกษา</option>
+              <label className={labelClass}>สถานภาพการศึกษา</label>
+              <select name="education_status" defaultValue={fullData.education_status || ""} className={inputClass}>
+                <option value="">เลือกสถานภาพ</option>
+                <option value="จบการศึกษาแล้ว">จบการศึกษาแล้ว</option>
+                <option value="กำลังศึกษาอยู่">กำลังศึกษาอยู่</option>
               </select>
             </div>
             <div>
-              <label className="text-[10px] text-gray-500 uppercase mb-1.5 block">ระดับการศึกษา</label>
-              <select name="education_level" defaultValue={d.education_level || ""} className="input-field">
-                <option value="">เลือก</option>
-                <option value="below_high_school">ต่ำกว่ามัยมศึกษา</option>
-                <option value="high_school">มัธยมศึกษา / ปวช.</option>
-                <option value="diploma">อนุปริญญา / ปวส.</option>
-                <option value="bachelor">ปริญญาตรี</option>
-                <option value="master">ปริญญาโท</option>
-                <option value="doctorate">ปริญญาเอก</option>
+              <label className={labelClass}>ระดับการศึกษาสูงสุด</label>
+              <select name="education_level" defaultValue={fullData.education_level || ""} className={inputClass}>
+                <option value="">เลือกระดับการศึกษา</option>
+                <option value="มัธยมศึกษาตอนปลาย">มัธยมศึกษาตอนปลาย / ปวช.</option>
+                <option value="อนุปริญญา">อนุปริญญา / ปวสน.</option>
+                <option value="ปริญญาตรี">ปริญญาตรี</option>
+                <option value="ปริญญาโท">ปริญญาโท</option>
+                <option value="ปริญญาเอก">ปริญญาเอก</option>
               </select>
             </div>
           </div>
-          <div>
-            <label className="text-[10px] text-gray-500 uppercase mb-1.5 block">สถาบันการศึกษา</label>
-            <input name="institution" defaultValue={d.institution || ""} className="input-field" />
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <label className={labelClass}>สถาบันการศึกษา</label>
+              <input name="institution" defaultValue={fullData.institution || ""} className={inputClass} placeholder="เช่น มหาวิทยาลัยสงขลานครินทร์" />
+            </div>
+            <div>
+              <label className={labelClass}>คณะ / สาขาวิชา</label>
+              <input name="field_of_study" defaultValue={fullData.field_of_study || ""} className={inputClass} placeholder="เช่น วิทยาการคอมพิวเตอร์" />
+            </div>
           </div>
-          <div>
-            <label className="text-[10px] text-gray-500 uppercase mb-1.5 block">สาขาวิชา</label>
-            <input name="field_of_study" defaultValue={d.field_of_study || ""} className="input-field" />
-          </div>
-        </section>
+        </div>
 
-        {/* ประสบการณ์ */}
-        <section className="glass-panel p-6 rounded-xl space-y-4">
-          <h2 className="text-xs font-medium text-gray-500 uppercase tracking-wider">ประสบการณ์ทำงาน</h2>
-          <div>
-            <label className="text-[10px] text-gray-500 uppercase mb-1.5 block">ชื่อบริษัท</label>
-            <input name="company_name" defaultValue={d.company_name || ""} className="input-field" />
+        {/* 5. ประวัติการทำงาน (ถ้ามี) */}
+        <div className="glass-panel p-6 rounded-xl space-y-4">
+          <h2 className={sectionTitle}>ประวัติการทำงานล่าสุด</h2>
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <label className={labelClass}>ชื่อบริษัท/องค์กร</label>
+              <input name="company_name" defaultValue={fullData.company_name || ""} className={inputClass} placeholder="เช่น JOBDEE Inc." />
+            </div>
+            <div>
+              <label className={labelClass}>ตำแหน่งงาน</label>
+              <input name="job_title" defaultValue={fullData.job_title || ""} className={inputClass} placeholder="เช่น Junior Developer" />
+            </div>
           </div>
           <div>
-            <label className="text-[10px] text-gray-500 uppercase mb-1.5 block">ตำแหน่งงาน</label>
-            <input name="job_title" defaultValue={d.job_title || ""} className="input-field" />
+            <label className={labelClass}>รายละเอียดหน้าที่งาน</label>
+            <textarea name="job_description" defaultValue={fullData.job_description || ""} rows={3} className={inputClass} placeholder="อธิบายสั้นๆ เกี่ยวกับหน้าที่ของคุณ..." />
           </div>
-          <div>
-            <label className="text-[10px] text-gray-500 uppercase mb-1.5 block">รายละเอียดงาน</label>
-            <textarea name="job_description" defaultValue={d.job_description || ""} rows={3} className="input-field" />
-          </div>
-        </section>
+        </div>
 
-        {/* ทักษะ */}
-        <section className="glass-panel p-6 rounded-xl space-y-4">
-          <h2 className="text-xs font-medium text-gray-500 uppercase tracking-wider">ทักษะและความสามารถ</h2>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-            <input name="skill_1" defaultValue={d.skill_1 || ""} placeholder="ทักษะที่ 1" className="input-field" />
-            <input name="skill_2" defaultValue={d.skill_2 || ""} placeholder="ทักษะที่ 2" className="input-field" />
-            <input name="skill_3" defaultValue={d.skill_3 || ""} placeholder="ทักษะที่ 3" className="input-field" />
-            <input name="skill_4" defaultValue={d.skill_4 || ""} placeholder="ทักษะที่ 4" className="input-field" />
+        {/* 6. ทักษะความสามารถ (Skills) */}
+        <div className="glass-panel p-6 rounded-xl space-y-4">
+          <h2 className={sectionTitle}>ทักษะและความสามารถ</h2>
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <label className={labelClass}>ทักษะที่ 1</label>
+              <input name="skill_1" defaultValue={fullData.skill_1 || ""} className={inputClass} placeholder="เช่น React / Next.js" />
+            </div>
+            <div>
+              <label className={labelClass}>ทักษะที่ 2</label>
+              <input name="skill_2" defaultValue={fullData.skill_2 || ""} className={inputClass} placeholder="เช่น TypeScript" />
+            </div>
           </div>
-          <div>
-            <label className="text-[10px] text-gray-500 uppercase mb-1.5 block">โครงการ / ผลงาน / ลิงก์ Portfolio</label>
-            <textarea name="portfolio" defaultValue={d.portfolio || ""} rows={3} className="input-field" />
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <label className={labelClass}>ทักษะที่ 3</label>
+              <input name="skill_3" defaultValue={fullData.skill_3 || ""} className={inputClass} placeholder="เช่น Node.js / ElysiaJS" />
+            </div>
+            <div>
+              <label className={labelClass}>ทักษะที่ 4</label>
+              <input name="skill_4" defaultValue={fullData.skill_4 || ""} className={inputClass} placeholder="เช่น SQL / Supabase" />
+            </div>
           </div>
-        </section>
+          <div className="pt-2">
+            <label className={labelClass}>ผลงาน / ลิงก์แนบเพิ่มเติม (Portfolio Link)</label>
+            <input name="portfolio" type="url" defaultValue={fullData.portfolio || ""} className={inputClass} placeholder="https://github.com/yourname" />
+          </div>
+        </div>
 
-        <button type="submit" className="no-print w-full p-3.5 bg-[var(--color-primary)] text-white rounded-xl text-xs font-medium hover:bg-[var(--color-primary-hover)] transition-colors cursor-pointer">
-          บันทึกข้อมูลทั้งหมด
+        <button type="submit" className="no-print w-full p-4 bg-[var(--color-primary)] text-white rounded-lg text-xs font-medium hover:bg-[var(--color-primary-hover)] transition-colors cursor-pointer text-center block">
+          บันทึกข้อมูลและอัปโหลดเรซูเมทั้งหมด
         </button>
       </form>
     </div>

@@ -55,6 +55,31 @@ export async function updateProfile(formData: FormData) {
 
   const full_name = formData.get("full_name") as string;
   
+  // จัดการอัปโหลดไฟล์เรซูเม (PDF)
+  const resumeFile = formData.get("resume") as File;
+  let resumeUrl = formData.get("existing_resume_url") as string || "";
+
+  if (resumeFile && resumeFile.size > 0 && resumeFile.type === "application/pdf") {
+    const fileExt = resumeFile.name.split(".").pop();
+    const fileName = `${user.id}-${Date.now()}.${fileExt}`;
+    
+    const { data: uploadData, error: uploadError } = await supabase.storage
+      .from("resumes")
+      .upload(fileName, resumeFile, {
+        cacheControl: "3600",
+        upsert: true
+      });
+
+    if (uploadError) {
+      console.error("Error uploading resume:", uploadError.message);
+    } else if (uploadData) {
+      const { data: { publicUrl } } = supabase.storage
+        .from("resumes")
+        .getPublicUrl(fileName);
+      resumeUrl = publicUrl;
+    }
+  }
+
   const full_data = {
     phone: formData.get("phone") as string,
     gender: formData.get("gender") as string,
@@ -80,6 +105,7 @@ export async function updateProfile(formData: FormData) {
     skill_3: formData.get("skill_3") as string,
     skill_4: formData.get("skill_4") as string,
     portfolio: formData.get("portfolio") as string,
+    resume_url: resumeUrl // เก็บ URL ของไฟล์ PDF
   };
 
   const { error } = await supabase
