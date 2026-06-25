@@ -1,36 +1,82 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# JOBDEE — แพลตฟอร์มหางาน สมัครงาน และฝากประวัติออนไลน์ 🚀
 
-## Getting Started
+JOBDEE คือแพลตฟอร์มบอร์ดหางานออนไลน์สำหรับคนไทย ที่ออกแบบด้วยสไตล์มินิมอล ธีมมืด (Dark-first minimal) เน้นการแสดงผลที่เรียบหรู คลีน ใช้งานง่าย และมีความเป็นมืออาชีพสูง พัฒนาขึ้นด้วยเทคโนโลยีเว็บสมัยใหม่ประสิทธิภาพสูง
 
-First, run the development server:
+🔗 **เว็บไซต์หลัก (Live Demo):** [https://jobdee.vercel.app](https://jobdee.vercel.app)
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+---
+
+## 🛠️ เทคโนโลยีหลักที่เลือกใช้ (Tech Stack)
+- **Frontend Framework:** [Next.js 16.2.9](https://nextjs.org/) (Turbopack, App Router)
+- **Styling:** [Tailwind CSS v4](https://tailwindcss.com/)
+- **Database & Auth & Storage:** [Supabase](https://supabase.com/) (`@supabase/ssr` ร่วมกับ PostgreSQL และ Google OAuth)
+- **ฟอนต์หลัก:**
+  - **Prompt:** สำหรับส่วนหัวข้อ (Display/Headers) เพื่อความชัดเจนในการอ่านภาษาไทย
+  - **Outfit:** สำหรับส่วนเนื้อหา (Body) มอบความหรูหราและมินิมอลในตัวอักษรภาษาอังกฤษ
+- **ระบบจัดเก็บไฟล์:** Supabase Storage (เก็บไฟล์ PDF เรซูเมพร้อมสิทธิ์ควบคุมความปลอดภัย RLS)
+
+---
+
+## ✨ คุณลักษณะเด่นของโครงการ (Key Features)
+1. **ระบบสมัครสมาชิกและล็อกอินตามบทบาท (Role-based Authentication):** แยกสิทธิ์การใช้งานตั้งแต่เริ่มต้นสมัครสมาชิกระหว่าง **ผู้สมัครงาน (Candidate)** และ **บริษัท/ผู้ประกอบการ (Company)** พร้อมทางเลือกในการลงชื่อเข้าใช้ผ่าน **Google OAuth**
+2. **ระบบฝากประวัติออนไลน์สุดละเอียด (Massive Interactive Resume Editor):** ฟอร์มแก้ไขประวัติ 6 ส่วนหลัก ตั้งแต่ข้อมูลทั่วไป การศึกษา ประสบการณ์ทำงาน ทักษะความสามารถ (Skills) ลิงก์พอร์ตโฟลิโอ และการอัปโหลดไฟล์ PDF เรซูเม
+3. **ระบบอัปโหลดไฟล์ PDF คุณภาพสูง:** ปรับขนาด Request limit ของ Server Actions รองรับไฟล์ขนาดใหญ่สูงสุดถึง **10MB** จัดเก็บบนคลาวด์จัดเก็บไฟล์สาธารณะ (Public Storage Bucket) ของ Supabase อย่างเสถียร
+4. **ระบบประกาศรับสมัครงานสำหรับบริษัท (Job Management Dashboard):** หน้าแดชบอร์ดเฉพาะสำหรับบริษัท สามารถสร้าง แก้ไข และลบประกาศงานได้อย่างสะดวก พร้อมตรวจสอบประวัติการสมัครงานที่ส่งเข้ามา
+5. **ดีไซน์กระจกโปร่งแสงสุดประณีต (Custom Glassmorphism):** ออกแบบพาเนลทุกชิ้นด้วยคลาส `.glass-panel` ที่มีการเบลอฉากหลังและการจัดวางแสงเงาที่เหมาะสม ปราศจากสีสันปุ่มกราเดียนต์ที่ฉูดฉาดแบบเทมเพลตทั่วไป
+6. **ระบบแจ้งเตือนแบบ Pop-up (Toast Notifications):** แจ้งเตือนสเตตัสความสำเร็จหรือข้อผิดพลาดอย่างชัดเจน มีดีเลย์ปิดเองอัตโนมัติ และปิดซ้ำปุ่มในระหว่างอัปโหลดเพื่อความปลอดภัย
+
+---
+
+## 📂 โครงสร้างโฟลเดอร์ที่สำคัญ (Project Structure)
+```text
+my-app/
+├── app/
+│   ├── auth/                   # ตัวจัดการการยืนยันตัวตนและการล็อกเอาต์
+│   ├── company/dashboard/      # หน้าแดชบอร์ดจัดการงานและการสมัครงานของบริษัท
+│   ├── dashboard/              # เราเตอร์คัดแยกผู้ใช้งานตามบทบาท
+│   ├── jobs/                   # หน้าบอร์ดหางานสาธารณะและรายละเอียดงานแต่ละตำแหน่ง
+│   ├── profile/                # เมนูจัดการประวัติส่วนตัว (ดูโปรไฟล์, ตั้งค่าบัญชี, แก้ไขประวัติ)
+│   ├── actions.ts              # ฟังก์ชัน Server Actions หลักทั้งหมด
+│   ├── globals.css             # คอนฟิกูเรชันสไตล์หลักและ Tailwind v4
+│   └── layout.tsx              # โครงสร้าง Layout หลักของเว็บไซต์
+├── components/
+│   ├── Navbar.tsx              # แถบนำทางด้านบนแบบตรวจจับผู้ใช้จริง
+│   ├── ProfileEditForm.tsx     # ฟอร์มแก้ไขประวัติและแนบไฟล์ (Client-side) พร้อม Toast Alert
+│   └── ThemeToggle.tsx         # ปุ่มสลับธีม สว่าง / มืด / ระบบ
+└── utils/supabase/             # ไฟล์คอนฟิก Supabase SSR (Client & Server)
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+---
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## 🚀 เริ่มต้นใช้งานบนเครื่องคอมพิวเตอร์ของคุณ (Local Development)
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+### 1. โคลนโปรเจกต์และติดตั้ง Dependencies
+```bash
+cd my-app
+npm install
+```
 
-## Learn More
+### 2. กำหนดค่าตัวแปรสภาพแวดล้อม (Environment Variables)
+สร้างไฟล์ `.env.local` ไว้ที่โฟลเดอร์รูทของโปรเจกต์ และใส่ค่าเชื่อมต่อ Supabase ของคุณ:
+```env
+NEXT_PUBLIC_SUPABASE_URL=your_supabase_project_url
+NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
+```
 
-To learn more about Next.js, take a look at the following resources:
+### 3. รันระบบสำหรับนักพัฒนา (Development Server)
+```bash
+npm run dev
+```
+จากนั้นเปิดบราวเซอร์เข้าไปที่ [http://localhost:3000](http://localhost:3000)
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+### 4. คอมไพล์และทดสอบโค้ดก่อนส่งมอบ
+```bash
+npm run build
+```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+---
 
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## 🔒 ข้อมูลความปลอดภัยและการจำกัดสิทธิ์ (Database & Storage Security)
+* ตาราง `profiles`, `jobs` และ `applications` ทั้งหมดถูกเปิดใช้งานระบบความปลอดภัยระดับแถว **Row-Level Security (RLS)**
+* ถังเก็บไฟล์ `resumes` ใน Supabase Storage ถูกกำหนดสิทธิ์ RLS ให้ผู้ใช้นอกระบบสามารถเปิดดูไฟล์ PDF ที่ผู้สมัครแนบได้เท่านั้น ส่วนสิทธิ์ในการแก้ไขหรืออัปโหลดจะถูกจำกัดเฉพาะผู้สมัครที่เป็นเจ้าของไฟล์จริงเท่านั้นเพื่อป้องกันความปลอดภัยของข้อมูล
+* ข้อมูลจำเพาะเพิ่มเติมเกี่ยวกับสคริปต์ SQL ฐานข้อมูลและ RLS สามารถดูได้ที่ไฟล์ `context.md`
