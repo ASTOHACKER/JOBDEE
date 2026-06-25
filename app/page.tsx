@@ -1,6 +1,7 @@
 import Navbar from "@/components/Navbar";
 import { createClient } from "@/utils/supabase/server";
 import Link from "next/link";
+import JobSearchSidebar from "@/components/JobSearchSidebar";
 
 export default async function Home() {
   const supabase = await createClient();
@@ -16,7 +17,6 @@ export default async function Home() {
   const { count: jobsCount } = await supabase.from("jobs").select("*", { count: "exact", head: true });
   const { count: profilesCount } = await supabase.from("profiles").select("*", { count: "exact", head: true });
 
-  // รายการบริษัทชั้นนำ (แบบจำลองตาม JobThai)
   const topCompanies = [
     { name: "CP Axtra", logo: "CPA", industry: "ค้าปลีก/ส่ง" },
     { name: "CPF", logo: "CPF", industry: "เกษตรและอาหาร" },
@@ -34,70 +34,9 @@ export default async function Home() {
         {/* Layout แบบ JobThai: สองคอลัมน์ใหญ่ (Sidebar คัดกรองซ้าย + คอนเทนต์ขวา) */}
         <div className="container mx-auto px-4 py-8 max-w-6xl mt-12 flex-1 flex flex-col md:flex-row gap-6">
           
-          {/* คอลัมน์ซ้าย: Sidebar ตัวกรองหางาน (แบบ JobThai) */}
+          {/* คอลัมน์ซ้าย: Sidebar ตัวกรองหางานละเอียด (สไตล์ JobThai) */}
           <aside className="w-full md:w-80 flex-shrink-0">
-            <div className="glass-panel p-6 rounded-xl space-y-5 sticky top-24">
-              <h2 className="text-xs font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-wider border-b border-gray-200/20 dark:border-gray-800/40 pb-2.5">
-                ค้นหาด่วน (Search Filter)
-              </h2>
-
-              <form action="/jobs" method="GET" className="space-y-4">
-                <div>
-                  <label className="text-[10px] text-gray-500 uppercase mb-1.5 block font-medium">คำค้นหา</label>
-                  <input
-                    name="q"
-                    type="text"
-                    placeholder="ตำแหน่งงาน, บริษัท..."
-                    className="w-full p-2.5 bg-gray-200/30 dark:bg-white/5 border border-gray-300/30 dark:border-white/5 rounded-lg outline-none text-xs focus:ring-2 focus:ring-[var(--color-primary)] transition-all"
-                  />
-                </div>
-
-                <div>
-                  <label className="text-[10px] text-gray-500 uppercase mb-1.5 block font-medium">สถานที่ทำงาน</label>
-                  <input
-                    name="loc"
-                    type="text"
-                    placeholder="เช่น กรุงเทพฯ, Remote..."
-                    className="w-full p-2.5 bg-gray-200/30 dark:bg-white/5 border border-gray-300/30 dark:border-white/5 rounded-lg outline-none text-xs focus:ring-2 focus:ring-[var(--color-primary)] transition-all"
-                  />
-                </div>
-
-                <div className="flex items-center gap-2 pt-1">
-                  <input
-                    type="checkbox"
-                    id="hybrid"
-                    name="q"
-                    value="Hybrid"
-                    className="w-3.5 h-3.5 rounded border-gray-300 text-[var(--color-primary)] focus:ring-[var(--color-primary)] accent-[#6366f1] cursor-pointer"
-                  />
-                  <label htmlFor="hybrid" className="text-[11px] text-gray-500 dark:text-gray-400 cursor-pointer select-none">
-                    รองรับการทำงานแบบ Hybrid / Remote
-                  </label>
-                </div>
-
-                <button 
-                  type="submit" 
-                  className="w-full py-2.5 bg-[var(--color-primary)] hover:bg-[var(--color-primary-hover)] text-white font-medium rounded-lg text-xs transition-colors cursor-pointer text-center block"
-                >
-                  ค้นหาตำแหน่งงาน
-                </button>
-              </form>
-
-              {/* สถิติจริงจากระบบ */}
-              <div className="pt-4 border-t border-gray-200/20 dark:border-gray-800/40 space-y-3">
-                <span className="text-[9px] text-gray-400 dark:text-gray-500 uppercase tracking-wider block font-semibold">ข้อมูลระบบเรียลไทม์</span>
-                <div className="grid grid-cols-2 gap-2">
-                  <div className="bg-gray-200/10 dark:bg-white/2 p-2 rounded text-center">
-                    <p className="text-sm font-semibold text-[var(--color-primary)]">{jobsCount || 0}</p>
-                    <p className="text-[8px] text-gray-500 mt-0.5">ตำแหน่งงาน</p>
-                  </div>
-                  <div className="bg-gray-200/10 dark:bg-white/2 p-2 rounded text-center">
-                    <p className="text-sm font-semibold text-[var(--color-accent)]">{profilesCount || 0}</p>
-                    <p className="text-[8px] text-gray-500 mt-0.5">ผู้สมัครงาน</p>
-                  </div>
-                </div>
-              </div>
-            </div>
+            <JobSearchSidebar />
           </aside>
 
           {/* คอลัมน์ขวา: แบนเนอร์ + ค้นหายอดฮิต + งานแนะนำ + บริษัทชั้นนำ */}
