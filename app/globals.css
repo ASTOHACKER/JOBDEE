@@ -1,21 +1,12 @@
 @import "tailwindcss";
 
 :root {
-  --background: #f8fafc;
-  --foreground: #0f172a;
-  --color-primary: #4f46e5;
-  --color-primary-hover: #4338ca;
-  --color-accent: #059669;
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #09090b;
-    --foreground: #f4f4f5;
-    --color-primary: #6366f1;
-    --color-primary-hover: #4f46e5;
-    --color-accent: #10b981;
-  }
+  /* บังคับเป็น Dark Mode 100% เสมอในทุกอุปกรณ์ */
+  --background: #09090b;
+  --foreground: #f4f4f5;
+  --color-primary: #6366f1;
+  --color-primary-hover: #4f46e5;
+  --color-accent: #10b981;
 }
 
 @theme inline {
@@ -38,17 +29,9 @@ body {
   box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
 }
 
-@media (prefers-color-scheme: light) {
-  .glass-panel {
-    background: rgba(255, 255, 255, 0.8);
-    border: 1px solid rgba(0, 0, 0, 0.04);
-    box-shadow: 0 2px 4px -1px rgba(0, 0, 0, 0.05);
-  }
-}
-
 /* Input focus */
 .input-field {
-  @apply w-full p-3 rounded-lg border outline-none transition-colors;
+  @apply w-full p-3 rounded-lg border outline-none transition-colors text-sm;
   background: rgba(18, 18, 24, 0.5);
   border-color: rgba(255, 255, 255, 0.1);
 }
