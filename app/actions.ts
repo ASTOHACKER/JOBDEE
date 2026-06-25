@@ -46,7 +46,7 @@ export async function signInWithGoogle() {
   if (data.url) redirect(data.url);
 }
 
-// ---- Profile ----
+// ---- Profile & Settings ----
 
 export async function updateProfile(formData: FormData) {
   const supabase = await createClient();
@@ -55,7 +55,6 @@ export async function updateProfile(formData: FormData) {
 
   const full_name = formData.get("full_name") as string;
   
-  // รวบรวมฟิลด์ทั้งหมดจากฟอร์ม
   const full_data = {
     phone: formData.get("phone") as string,
     gender: formData.get("gender") as string,
@@ -93,6 +92,31 @@ export async function updateProfile(formData: FormData) {
   revalidatePath("/profile");
 }
 
+export async function updateEmail(_prevState: unknown, formData: FormData) {
+  const supabase = await createClient();
+  const email = formData.get("email") as string;
+
+  const { error } = await supabase.auth.updateUser({ email });
+
+  if (error) return { error: error.message };
+  return { success: "ระบบได้ส่งลิงก์ยืนยันการเปลี่ยนอีเมลไปยังอีเมลใหม่ของคุณแล้ว" };
+}
+
+export async function updatePassword(_prevState: unknown, formData: FormData) {
+  const supabase = await createClient();
+  const password = formData.get("password") as string;
+  const confirmPassword = formData.get("confirm_password") as string;
+
+  if (password !== confirmPassword) {
+    return { error: "รหัสผ่านใหม่ไม่ตรงกัน" };
+  }
+
+  const { error } = await supabase.auth.updateUser({ password });
+
+  if (error) return { error: error.message };
+  return { success: "เปลี่ยนรหัสผ่านของคุณเรียบร้อยแล้ว" };
+}
+
 // ---- Jobs (Company) ----
 
 export async function createJob(formData: FormData) {
@@ -111,4 +135,5 @@ export async function createJob(formData: FormData) {
   if (error) throw new Error(error.message);
   revalidatePath("/company/dashboard");
   revalidatePath("/jobs");
+  revalidatePath("/");
 }

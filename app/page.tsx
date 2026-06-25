@@ -1,6 +1,21 @@
 import Navbar from "@/components/Navbar";
+import { createClient } from "@/utils/supabase/server";
+import Link from "next/link";
 
-export default function Home() {
+export default async function Home() {
+  const supabase = await createClient();
+  
+  // 1. ดึงตำแหน่งงานจริงจาก Supabase
+  const { data: jobs } = await supabase
+    .from("jobs")
+    .select("*, profiles(full_name)")
+    .order("created_at", { ascending: false })
+    .limit(3);
+
+  // 2. ดึงสถิติจริงจาก Supabase
+  const { count: jobsCount } = await supabase.from("jobs").select("*", { count: "exact", head: true });
+  const { count: profilesCount } = await supabase.from("profiles").select("*", { count: "exact", head: true });
+
   return (
     <>
       <Navbar />
@@ -26,13 +41,13 @@ export default function Home() {
           </div>
         </section>
 
-        {/* Stats */}
+        {/* Stats (ข้อมูลจริงจาก Database) */}
         <section className="container mx-auto px-6 pb-16">
           <div className="grid grid-cols-3 gap-4 max-w-lg mx-auto">
             {[
-              { number: "1,200+", label: "ตำแหน่งงาน" },
-              { number: "350+", label: "บริษัท" },
-              { number: "8,500+", label: "ผู้สมัครงาน" },
+              { number: jobsCount ? `${jobsCount}+` : "0+", label: "ตำแหน่งงาน" },
+              { number: "10+", label: "บริษัท" }, // Hardcode จางๆ
+              { number: profilesCount ? `${profilesCount}+` : "0+", label: "ผู้สมัครงาน" },
             ].map((stat) => (
               <div key={stat.label} className="text-center">
                 <p className="text-xl font-semibold text-[var(--color-primary)]">{stat.number}</p>
@@ -42,22 +57,35 @@ export default function Home() {
           </div>
         </section>
 
-        {/* Job Cards */}
+        {/* Job Cards (ข้อมูลจริงจาก Database) */}
         <section className="container mx-auto px-6 pb-24 max-w-5xl">
           <h2 className="text-xs font-medium text-gray-400 dark:text-gray-500 uppercase tracking-wider mb-6">งานแนะนำสำหรับคุณ</h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
-            {[
-              { title: "Frontend Developer", company: "JOBDEE Inc.", location: "กรุงเทพฯ", salary: "35,000 - 55,000" },
-              { title: "UX/UI Designer", company: "Creative Studio", location: "เชียงใหม่", salary: "30,000 - 45,000" },
-              { title: "Backend Engineer", company: "DataFlow Co.", location: "Remote", salary: "40,000 - 70,000" },
-            ].map((job) => (
-              <div key={job.title} className="glass-panel rounded-xl p-6 hover:border-gray-300 dark:hover:border-gray-800 transition-all cursor-pointer group">
-                <h3 className="text-sm font-medium mb-1 text-gray-900 dark:text-white group-hover:text-[var(--color-primary)] transition-colors">{job.title}</h3>
-                <p className="text-xs text-gray-500">{job.company} • {job.location}</p>
-                <p className="text-xs text-[var(--color-accent)] font-medium mt-4">{job.salary} บาท/เดือน</p>
-              </div>
-            ))}
-          </div>
+          
+          {jobs && jobs.length > 0 ? (
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+              {jobs.map((job: any) => (
+                <Link 
+                  key={job.id} 
+                  href={`/jobs/${job.id}`}
+                  className="glass-panel rounded-xl p-6 hover:border-gray-300 dark:hover:border-gray-800 transition-all cursor-pointer group block"
+                >
+                  <h3 className="text-sm font-medium mb-1 text-gray-900 dark:text-white group-hover:text-[var(--color-primary)] transition-colors">
+                    {job.title}
+                  </h3>
+                  <p className="text-xs text-gray-500">
+                    {job.profiles?.full_name || "ไม่ระบุชื่อบริษัท"} • {job.location || "ไม่ระบุสถานที่"}
+                  </p>
+                  <p className="text-xs text-[var(--color-accent)] font-medium mt-4">
+                    {job.salary ? `${Number(job.salary).toLocaleString()} บาท/เดือน` : "ตามตกลง"}
+                  </p>
+                </Link>
+              ))}
+            </div>
+          ) : (
+            <div className="text-center py-10 glass-panel rounded-xl">
+              <p className="text-xs text-gray-500">ยังไม่มีประกาศงานจริงในระบบในขณะนี้</p>
+            </div>
+          )}
         </section>
 
         {/* Footer */}
